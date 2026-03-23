@@ -5,7 +5,8 @@ import '../providers/database_provider.dart';
 import '../data/database.dart';
 
 class AddAccountSheet extends ConsumerStatefulWidget {
-  const AddAccountSheet({super.key});
+  final Account? initialAccount;
+  const AddAccountSheet({super.key, this.initialAccount});
 
   @override
   ConsumerState<AddAccountSheet> createState() => _AddAccountSheetState();
@@ -13,15 +14,24 @@ class AddAccountSheet extends ConsumerStatefulWidget {
 
 class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _type = 'Cash'; // Default
-  double _balance = 0.0;
+  late String _name;
+  late String _type;
+  late double _balance;
   
-  final List<String> _accountTypes = ['Cash', 'bKash', 'Nagad', 'Rocket', 'Bank', 'Credit Card'];
+  final List<String> _accountTypes = ['Cash', 'Bank', 'bKash', 'Nagad', 'Rocket', 'CreditCard'];
+
+  @override
+  void initState() {
+    super.initState();
+    _name = widget.initialAccount?.name ?? '';
+    _type = widget.initialAccount?.type ?? 'Cash';
+    _balance = widget.initialAccount?.initialBalance ?? 0.0;
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isEditing = widget.initialAccount != null;
     
     return Padding(
       padding: EdgeInsets.only(
@@ -37,19 +47,22 @@ class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Add New Account',
+              isEditing ? 'Edit Account' : 'Add New Account',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.primary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             TextFormField(
+              initialValue: _name,
               decoration: InputDecoration(
                 labelText: 'Account Name',
                 hintText: 'e.g. Physical Wallet, DBBL...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
               validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               onSaved: (val) => _name = val ?? '',
@@ -59,16 +72,21 @@ class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
               value: _type,
               decoration: InputDecoration(
                 labelText: 'Account Type',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
               items: _accountTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
               onChanged: (val) => setState(() => _type = val!),
             ),
             const SizedBox(height: 16),
             TextFormField(
+              initialValue: _balance.toStringAsFixed(0),
               decoration: InputDecoration(
-                labelText: 'Initial Balance (৳)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                labelText: _type == 'CreditCard' ? 'Credit Limit (৳)' : 'Initial Balance (৳)',
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               validator: (val) {
@@ -85,11 +103,19 @@ class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
                   _formKey.currentState!.save();
                   
                   final db = ref.read(databaseProvider);
-                  await db.addAccount(AccountsCompanion(
-                    name: drift.Value(_name),
-                    type: drift.Value(_type),
-                    initialBalance: drift.Value(_balance),
-                  ));
+                  if (isEditing) {
+                    await db.updateAccount(widget.initialAccount!.copyWith(
+                      name: _name,
+                      type: _type,
+                      initialBalance: _balance,
+                    ));
+                  } else {
+                    await db.addAccount(AccountsCompanion(
+                      name: drift.Value(_name),
+                      type: drift.Value(_type),
+                      initialBalance: drift.Value(_balance),
+                    ));
+                  }
                   
                   if (context.mounted) Navigator.pop(context);
                 }
@@ -100,7 +126,7 @@ class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('Save Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              child: Text(isEditing ? 'Update Account' : 'Save Account', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 32),
           ],
@@ -109,4 +135,3 @@ class _AddAccountSheetState extends ConsumerState<AddAccountSheet> {
     );
   }
 }
-

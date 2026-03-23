@@ -99,7 +99,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                          backgroundImage: settings.profileImagePath != null
+                          backgroundImage: settings.profileImagePath != null && File(settings.profileImagePath!).existsSync()
                               ? FileImage(File(settings.profileImagePath!))
                               : null,
                           child: settings.profileImagePath == null

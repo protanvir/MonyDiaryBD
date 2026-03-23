@@ -136,6 +136,10 @@ class AppDatabase extends _$AppDatabase {
         .write(AccountsCompanion(name: Value(newName)));
   }
 
+  Future<void> updateAccount(Account account) async {
+    await update(accounts).replace(account);
+  }
+
   Future<void> deleteAccountAndTransactions(int accountId) async {
     return transaction(() async {
       await (delete(transactions)..where((t) => t.accountId.equals(accountId))).go();

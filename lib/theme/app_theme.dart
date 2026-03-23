@@ -75,4 +75,47 @@ class AppTheme {
       ),
     );
   }
+
+  static ThemeData get darkTheme {
+    final ColorScheme colorScheme = const ColorScheme(
+      brightness: Brightness.dark,
+      primary: Color(0xFF22D3EE),
+      onPrimary: Color(0xFF083344),
+      primaryContainer: Color(0xFF164E63),
+      onPrimaryContainer: Color(0xFFCFFAFE),
+      secondary: Color(0xFF0891B2),
+      onSecondary: Color(0xFFFFFFFF),
+      secondaryContainer: Color(0xFF0E7490),
+      onSecondaryContainer: Color(0xFFCFFAFE),
+      tertiary: Color(0xFF4ADE80),
+      onTertiary: Color(0xFF052E16),
+      surface: Color(0xFF0F172A), // Deep Slate
+      onSurface: Color(0xFFF1F5F9),
+      surfaceContainerHighest: Color(0xFF1E293B),
+      onSurfaceVariant: Color(0xFF94A3B8),
+      outline: Color(0xFF475569),
+      outlineVariant: Color(0xFF334155),
+      error: Color(0xFFFB7185),
+      onError: Color(0xFF4C0519),
+    );
+
+    final TextTheme textTheme = lightTheme.textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.8),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+      elevatedButtonTheme: lightTheme.elevatedButtonTheme,
+      floatingActionButtonTheme: lightTheme.floatingActionButtonTheme,
+    );
+  }
 }

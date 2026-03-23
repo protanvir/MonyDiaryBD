@@ -4,6 +4,7 @@ import '../providers/account_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/user_provider.dart';
+import '../providers/theme_provider.dart';
 import '../widgets/add_transaction_sheet.dart';
 import '../services/backup_service.dart';
 import 'profile_settings_screen.dart';
@@ -44,6 +45,13 @@ class DashboardScreen extends ConsumerWidget {
         backgroundColor: theme.colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            icon: Icon(
+              ref.watch(themeModeProvider) == ThemeMode.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              color: theme.colorScheme.primary,
+            ),
+            onPressed: () => ref.toggleTheme(),
+          ),
           IconButton(
             icon: Icon(Icons.settings_outlined, color: theme.colorScheme.primary),
             onPressed: () {
@@ -123,13 +131,45 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     accountsAsync.when(
                       data: (accounts) {
-                        final total = accounts.fold(0.0, (sum, acc) => sum + (acc.initialBalance ?? 0));
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
+                        final assets = accounts.where((a) => a.type != 'CreditCard').fold(0.0, (sum, acc) => sum + (acc.initialBalance ?? 0));
+                        final outstanding = accounts.where((a) => a.type == 'CreditCard').fold(0.0, (sum, acc) => sum + (acc.currentBalance ?? 0));
+                        
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('৳ ', style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8))),
-                            Text(total.toStringAsFixed(0), style: theme.textTheme.displayLarge?.copyWith(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.w800, letterSpacing: -2)),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text('৳ ', style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8))),
+                                Text(assets.toStringAsFixed(0), style: theme.textTheme.displayLarge?.copyWith(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.w800, letterSpacing: -2)),
+                              ],
+                            ),
+                            if (outstanding > 0) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.onPrimaryContainer.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.credit_card, size: 14, color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7)),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Credit Card Outstanding: ',
+                                      style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7)),
+                                    ),
+                                    Text(
+                                      '৳${outstanding.toStringAsFixed(0)}',
+                                      style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ],
                         );
                       },
@@ -230,12 +270,12 @@ class DashboardScreen extends ConsumerWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: isExpense ? const Color(0xFFE2136E).withOpacity(0.1) : theme.colorScheme.primaryFixed,
+            color: isExpense ? theme.colorScheme.error.withOpacity(0.1) : theme.colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(
             isExpense ? Icons.shopping_bag_outlined : Icons.account_balance,
-            color: isExpense ? const Color(0xFFE2136E) : theme.colorScheme.primary,
+            color: isExpense ? theme.colorScheme.error : theme.colorScheme.primary,
           ),
         ),
         title: Text(

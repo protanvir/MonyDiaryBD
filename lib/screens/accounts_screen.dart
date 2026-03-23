@@ -15,244 +15,231 @@ class AccountsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      body: SafeArea(
-        child: accountsAsync.when(
-          data: (accounts) {
-            final totalBalance = accounts.fold(0.0, (sum, acc) => sum + (acc.initialBalance ?? 0));
-            
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 24, right: 24, top: 40, bottom: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'TOTAL LIQUIDITY',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            letterSpacing: 2.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              '৳ ',
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                color: theme.colorScheme.primary.withOpacity(0.8),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              totalBalance.toStringAsFixed(2),
-                              style: theme.textTheme.displayMedium?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+      appBar: AppBar(
+        title: Text(
+          'My Wallet',
+          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.primary),
+        ),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        centerTitle: false,
+      ),
+      body: accountsAsync.when(
+        data: (accounts) {
+          final assets = accounts.where((a) => a.type != 'CreditCard').toList();
+          final totalAssets = assets.fold(0.0, (sum, acc) => sum + (acc.initialBalance ?? 0));
+          
+          final creditCards = accounts.where((a) => a.type == 'CreditCard').toList();
+          final totalLiability = creditCards.fold(0.0, (sum, acc) => sum + (acc.currentBalance ?? 0));
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: _buildSummaryCard(context, totalAssets, totalLiability),
+                ),
+              ),
+              if (assets.isNotEmpty) ...[
+                _buildSectionHeader(context, 'CASH & BANK'),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _buildAccountTile(context, ref, assets[index]),
+                    childCount: assets.length,
                   ),
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  sliver: accounts.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: const Center(child: Text('No accounts found.')),
-                        )
-                      : SliverGrid(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.9,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildAccountCard(context, ref, accounts[index]),
-                            childCount: accounts.length,
-                          ),
-                        ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 100)), // Bottom padding
               ],
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, st) => Center(child: Text('Error: $e')),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'accounts_fab',
-        backgroundColor: theme.colorScheme.primaryContainer,
-        foregroundColor: theme.colorScheme.onPrimaryContainer,
-        elevation: 4,
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            showDragHandle: true,
-            backgroundColor: theme.colorScheme.surface,
-            builder: (context) => const AddAccountSheet(),
+              if (creditCards.isNotEmpty) ...[
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                _buildSectionHeader(context, 'CREDIT CARDS'),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _buildAccountTile(context, ref, creditCards[index]),
+                    childCount: creditCards.length,
+                  ),
+                ),
+              ],
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            ],
           );
         },
-        child: const Icon(Icons.add),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Error: $e')),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAccountSheet(context, ref),
+        label: const Text('Add Account', style: TextStyle(fontWeight: FontWeight.bold)),
+        icon: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildAccountCard(BuildContext context, WidgetRef ref, Account account) {
+  Widget _buildSummaryCard(BuildContext context, double assets, double debt) {
+    final theme = Theme.of(context);
+    final netWorth = assets - debt;
+    
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(color: theme.colorScheme.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text('Net Worth', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onPrimary.withOpacity(0.8))),
+          const SizedBox(height: 8),
+          FittedBox(
+            child: Text(
+              '৳ ${netWorth.toStringAsFixed(0)}',
+              style: theme.textTheme.displayMedium?.copyWith(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w800),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildMiniStat(context, 'Assets', assets, theme.colorScheme.onPrimary),
+              Container(width: 1, height: 30, color: theme.colorScheme.onPrimary.withOpacity(0.2)),
+              _buildMiniStat(context, 'Liabilities', debt, theme.colorScheme.onPrimary),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniStat(BuildContext context, String label, double amount, Color color) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Text(label, style: theme.textTheme.labelSmall?.copyWith(color: color.withOpacity(0.7))),
+        Text('৳${amount.toStringAsFixed(0)}', style: theme.textTheme.titleMedium?.copyWith(color: color, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24, top: 24, bottom: 8),
+        child: Text(
+          title,
+          style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccountTile(BuildContext context, WidgetRef ref, Account account) {
     final theme = Theme.of(context);
     
-    // Determine styles based on Stitch design templates
-    Color bgColor;
-    Color iconColor;
-    Color iconBgColor;
-    Color textColor = theme.colorScheme.onSurface;
-    IconData icon;
-    String typeLabel = account.type.toUpperCase();
+    final (icon, color) = _getAccountVisuals(account);
+    final displayBalance = account.type == 'CreditCard' ? (account.currentBalance ?? 0.0) : (account.initialBalance ?? 0.0);
 
-    if (account.type == 'bKash') {
-      bgColor = theme.colorScheme.surfaceContainerLow;
-      iconColor = const Color(0xFFE2136E); // bKash Pink
-      iconBgColor = iconColor.withOpacity(0.1);
-      icon = Icons.account_balance_wallet;
-    } else if (account.type == 'Nagad') {
-      bgColor = theme.colorScheme.surfaceContainerLow;
-      iconColor = const Color(0xFFF57C00); // Nagad Orange
-      iconBgColor = iconColor.withOpacity(0.1);
-      icon = Icons.account_balance_wallet;
-    } else if (account.type == 'Bank') {
-      bgColor = theme.colorScheme.primaryContainer;
-      textColor = theme.colorScheme.onPrimaryContainer;
-      iconColor = theme.colorScheme.onPrimaryContainer;
-      iconBgColor = theme.colorScheme.onPrimaryContainer.withOpacity(0.2);
-      icon = Icons.account_balance;
-    } else {
-      // Cash
-      bgColor = theme.colorScheme.surfaceContainerLow;
-      iconColor = theme.colorScheme.onPrimaryFixed;
-      iconBgColor = theme.colorScheme.primaryFixed;
-      icon = Icons.payments;
-    }
-
-    return GestureDetector(
-      onLongPress: () {
-        final controller = TextEditingController(text: account.name);
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Rename Account'),
-            content: TextField(
-              controller: controller,
-              autofocus: true,
-              decoration: InputDecoration(
-                labelText: 'Account Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-              FilledButton(
-                onPressed: () async {
-                  if (controller.text.isNotEmpty) {
-                    await ref.read(databaseProvider).updateAccountName(account.id, controller.text);
-                  }
-                  if (ctx.mounted) Navigator.pop(ctx);
-                },
-                child: const Text('Save'),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: InkWell(
+        onTap: () => _showAccountSheet(context, ref, account: account),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withOpacity(0.1)),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: iconBgColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(icon, color: iconColor),
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+                child: Icon(icon, color: color),
               ),
-              if (account.type != 'Cash' && account.type != 'Bank')
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: iconBgColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      typeLabel,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: iconColor, letterSpacing: 1),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(account.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(account.type, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                  ],
                 ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                account.name,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                  height: 1.2,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    '৳',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: account.type == 'Bank' ? theme.colorScheme.onPrimaryContainer.withOpacity(0.7) : theme.colorScheme.primary.withOpacity(0.7),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    account.initialBalance?.toStringAsFixed(0) ?? '0',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: textColor,
-                    ),
+                  Text('৳${displayBalance.toStringAsFixed(0)}', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: account.type == 'CreditCard' ? theme.colorScheme.error : theme.colorScheme.primary)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        onPressed: () => _showAccountSheet(context, ref, account: account),
+                      ),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                        onPressed: () => _confirmDelete(context, ref, account),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  (IconData, Color) _getAccountVisuals(Account account) {
+    return switch (account.type) {
+      'Cash' => (Icons.payments_outlined, Colors.teal),
+      'Bank' => (Icons.account_balance_outlined, Colors.blue),
+      'bKash' => (Icons.account_balance_wallet_outlined, const Color(0xFFE2136E)),
+      'Nagad' => (Icons.account_balance_wallet_outlined, Colors.orange),
+      'Rocket' => (Icons.account_balance_wallet_outlined, Colors.purple),
+      'CreditCard' => (Icons.credit_card_outlined, Colors.indigo),
+      _ => (Icons.wallet_outlined, Colors.grey),
+    };
+  }
+
+  void _showAccountSheet(BuildContext context, WidgetRef ref, {Account? account}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => AddAccountSheet(initialAccount: account),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, Account account) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account?'),
+        content: Text('Are you sure you want to delete "${account.name}"? This will also delete all associated transactions.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () async {
+              await ref.read(databaseProvider).deleteAccountAndTransactions(account.id);
+              if (ctx.mounted) Navigator.pop(ctx);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
-    ));
+    );
   }
 }
-
