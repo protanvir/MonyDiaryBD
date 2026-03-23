@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#eceeee",
+              "error": "#ba1a1a",
+              "surface-variant": "#e1e3e3",
+              "on-surface-variant": "#3e4945",
+              "surface-container-highest": "#e1e3e3",
+              "surface-tint": "#006b59",
+              "on-secondary": "#ffffff",
+              "secondary": "#52615e",
+              "inverse-primary": "#81d6c0",
+              "error-container": "#ffdad6",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#e6e8e8",
+              "surface-bright": "#f8fafa",
+              "on-secondary-container": "#576663",
+              "surface": "#f8fafa",
+              "surface-dim": "#d8dada",
+              "on-background": "#191c1d",
+              "secondary-fixed-dim": "#bacac6",
+              "secondary-fixed": "#d6e6e2",
+              "on-primary-fixed": "#00201a",
+              "tertiary-container": "#c0004d",
+              "primary-fixed-dim": "#81d6c0",
+              "primary-fixed": "#9df3dc",
+              "tertiary": "#940039",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed-dim": "#ffb2be",
+              "inverse-surface": "#2e3131",
+              "inverse-on-surface": "#eff1f1",
+              "on-primary-container": "#96ebd5",
+              "on-tertiary-container": "#ffd0d6",
+              "tertiary-fixed": "#ffd9de",
+              "on-tertiary-fixed-variant": "#900038",
+              "on-tertiary-fixed": "#400014",
+              "on-primary": "#ffffff",
+              "secondary-container": "#d3e3df",
+              "on-secondary-fixed": "#101e1c",
+              "outline-variant": "#bec9c4",
+              "background": "#f8fafa",
+              "primary-container": "#006d5b",
+              "on-surface": "#191c1d",
+              "on-secondary-fixed-variant": "#3b4a47",
+              "primary": "#005344",
+              "outline": "#6e7975",
+              "on-primary-fixed-variant": "#005143",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f2f4f4",
+              "on-tertiary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar from Shared Components JSON -->
+<header class="w-full top-0 sticky z-40 bg-slate-50 dark:bg-slate-950 flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="User profile photo avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRKgbg9FtM2pH7Us8wYCvVpV1Ch7kfROWdnJPT_fopq8PltYg8c-1qmbrt8DDzV4pa5apnJH3oXbZh414PHdDLWsVuV7dSDkgRICqEyGS4KCsnjPIgS3Nx40GjqWlLtcRHmwDtf5qiiQv8UmMVKjS9YyUaq3LsI_8igjqtyYJVe497IFqVcZ0z3LaDx0gqR_845j951SZTkmwdayxycbxPwSQ-ENQMcHcTEhtNoMQRt4JCdFDz2BKSNdJHq8XwPS8s2kIwW41M7g"/>
+</div>
+<h1 class="font-manrope font-bold text-lg tracking-tight text-emerald-900 dark:text-emerald-500">Editorial Finance</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="flex-grow px-6 pt-6 pb-32 max-w-2xl mx-auto w-full">
+<!-- Hero Section: Total Liquidity -->
+<section class="mb-10">
+<p class="text-on-surface-variant font-label text-sm tracking-widest uppercase mb-2">Total Liquidity</p>
+<div class="flex items-baseline gap-1">
+<span class="text-primary font-headline text-4xl font-extrabold opacity-80">৳</span>
+<h2 class="text-on-surface font-headline text-5xl font-extrabold tracking-tight">80,000</h2>
+</div>
+<div class="mt-6 flex gap-3">
+<button class="flex-1 bg-primary text-on-primary py-4 px-6 rounded-2xl font-headline font-bold flex items-center justify-center gap-2 shadow-xl shadow-primary/10 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-lg" data-icon="sync_alt">sync_alt</span>
+                    Transfer Money
+                </button>
+</div>
+</section>
+<!-- Bento Grid: Accounts -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Cash Account (Large Highlight) -->
+<div class="md:col-span-2 bg-surface-container-low p-6 rounded-3xl flex flex-col justify-between min-h-[160px] relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl" data-icon="payments">payments</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" data-icon="payments">payments</span>
+</div>
+<h3 class="font-headline font-bold text-xl">Cash</h3>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Physical Wallet</p>
+</div>
+<div class="flex items-baseline gap-1 mt-4">
+<span class="text-primary font-headline text-xl font-bold opacity-70">৳</span>
+<span class="text-on-surface font-headline text-3xl font-extrabold">4,500</span>
+</div>
+</div>
+<!-- bKash (Themed Card) -->
+<div class="bg-surface-container-low p-6 rounded-3xl flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-2xl bg-[#D82061]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#D82061]" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-[#D82061] bg-[#D82061]/5 px-2 py-1 rounded-md">MFS</span>
+</div>
+<div class="mt-4">
+<h3 class="font-headline font-bold text-lg">bKash</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-primary font-headline text-sm font-bold opacity-70">৳</span>
+<span class="text-on-surface font-headline text-2xl font-extrabold">12,000</span>
+</div>
+</div>
+</div>
+<!-- Nagad (Themed Card) -->
+<div class="bg-surface-container-low p-6 rounded-3xl flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-2xl bg-[#F57C00]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#F57C00]" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-[#F57C00] bg-[#F57C00]/5 px-2 py-1 rounded-md">MFS</span>
+</div>
+<div class="mt-4">
+<h3 class="font-headline font-bold text-lg">Nagad</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-primary font-headline text-sm font-bold opacity-70">৳</span>
+<span class="text-on-surface font-headline text-2xl font-extrabold">6,500</span>
+</div>
+</div>
+</div>
+<!-- Bank Account (Primary Theme) -->
+<div class="bg-primary-container p-6 rounded-3xl flex flex-col justify-between min-h-[160px] md:col-span-2">
+<div class="flex justify-between items-start text-on-primary-container">
+<div class="w-12 h-12 rounded-2xl bg-on-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div class="text-right">
+<h3 class="font-headline font-bold text-lg">Standard Chartered</h3>
+<p class="text-xs opacity-70 font-mono tracking-widest">**** 8820</p>
+</div>
+</div>
+<div class="flex justify-between items-end mt-6">
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-primary-container/60 mb-1">Available Balance</p>
+<div class="flex items-baseline gap-1">
+<span class="text-on-primary-container font-headline text-lg font-bold opacity-70">৳</span>
+<span class="text-white font-headline text-3xl font-extrabold">45,000</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-full border border-on-primary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Credit Card (Tonal Layering) -->
+<div class="md:col-span-2 bg-surface-container-highest p-6 rounded-3xl border border-outline-variant/10">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="credit_card">credit_card</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg">Visa Infinite</h3>
+<p class="text-on-surface-variant text-xs font-medium uppercase tracking-tighter">Credit Remaining</p>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-baseline gap-1">
+<span class="text-tertiary font-headline text-sm font-bold opacity-70">৳</span>
+<span class="text-on-surface font-headline text-xl font-extrabold">12,000</span>
+</div>
+<p class="text-[10px] text-on-surface-variant">Limit: ৳1,50,000</p>
+</div>
+</div>
+<!-- Progress Bar Style (No line rule followed by tonal shift) -->
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[8%] h-full bg-tertiary rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from Shared Components JSON -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-[2rem] bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-emerald-900/5 dark:border-emerald-500/10 shadow-[0_-4px_24px_rgba(0,83,68,0.04)] flex justify-around items-center w-full px-4 pb-6 pt-3">
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-emerald-700 dark:hover:text-emerald-300 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-inter text-[10px] font-medium tracking-wide uppercase">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-emerald-700 dark:hover:text-emerald-300 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="receipt_long">receipt_long</span>
+<span class="font-inter text-[10px] font-medium tracking-wide uppercase">Activity</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-emerald-700 dark:hover:text-emerald-300 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-inter text-[10px] font-medium tracking-wide uppercase">Budgets</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:text-emerald-700 dark:hover:text-emerald-300 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="leaderboard">leaderboard</span>
+<span class="font-inter text-[10px] font-medium tracking-wide uppercase">Reports</span>
+</div>
+<!-- ACTIVE TAB: Accounts (Determined by context) -->
+<div class="flex flex-col items-center justify-center bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-100 rounded-2xl px-3 py-1.5 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="account_balance" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-inter text-[10px] font-medium tracking-wide uppercase">Accounts</span>
+</div>
+</nav>
+</body></html>
