@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../providers/user_provider.dart';
+import 'about_screen.dart';
 
 class ProfileSettingsScreen extends ConsumerStatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -210,6 +211,29 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               onChanged: (val) => settingsNotifier.setUseBiometrics(val),
               contentPadding: EdgeInsets.zero,
             ),
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.info_outline_rounded, color: theme.colorScheme.primary),
+              ),
+              title: const Text('About Money Diary'),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutScreen()),
+                );
+              },
+              contentPadding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
