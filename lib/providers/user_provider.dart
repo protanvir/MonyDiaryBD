@@ -9,6 +9,7 @@ class UserSettings {
   final String name;
   final String email;
   final String? pin;
+  final String? pinHint;
   final bool useBiometrics;
   final String? profileImagePath;
 
@@ -16,6 +17,7 @@ class UserSettings {
     this.name = 'User',
     this.email = '',
     this.pin,
+    this.pinHint,
     this.useBiometrics = false,
     this.profileImagePath,
   });
@@ -24,6 +26,7 @@ class UserSettings {
     String? name,
     String? email,
     String? pin,
+    String? pinHint,
     bool? useBiometrics,
     String? profileImagePath,
     bool clearPin = false,
@@ -33,6 +36,7 @@ class UserSettings {
       name: name ?? this.name,
       email: email ?? this.email,
       pin: clearPin ? null : (pin ?? this.pin),
+      pinHint: pinHint ?? this.pinHint,
       useBiometrics: useBiometrics ?? this.useBiometrics,
       profileImagePath: clearImage ? null : (profileImagePath ?? this.profileImagePath),
     );
@@ -49,6 +53,7 @@ class UserSettingsNotifier extends Notifier<UserSettings> {
       name: _prefs.getString('userName') ?? 'User',
       email: _prefs.getString('userEmail') ?? '',
       pin: _prefs.getString('userPin'),
+      pinHint: _prefs.getString('userPinHint'),
       useBiometrics: _prefs.getBool('useBiometrics') ?? false,
       profileImagePath: _prefs.getString('profileImagePath'),
     );
@@ -71,7 +76,13 @@ class UserSettingsNotifier extends Notifier<UserSettings> {
 
   Future<void> clearPin() async {
     await _prefs.remove('userPin');
-    state = state.copyWith(clearPin: true);
+    await _prefs.remove('userPinHint');
+    state = state.copyWith(clearPin: true, pinHint: '');
+  }
+
+  Future<void> updatePinHint(String hint) async {
+    await _prefs.setString('userPinHint', hint);
+    state = state.copyWith(pinHint: hint);
   }
 
   Future<void> setUseBiometrics(bool use) async {

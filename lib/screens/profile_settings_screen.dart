@@ -17,6 +17,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _pinController;
+  late TextEditingController _pinHintController;
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -26,6 +27,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     _nameController = TextEditingController(text: settings.name);
     _emailController = TextEditingController(text: settings.email);
     _pinController = TextEditingController(text: settings.pin ?? '');
+    _pinHintController = TextEditingController(text: settings.pinHint ?? '');
   }
 
   @override
@@ -33,6 +35,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _pinController.dispose();
+    _pinHintController.dispose();
     super.dispose();
   }
 
@@ -185,6 +188,20 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 }
               },
             ),
+            if (settings.pin != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: TextField(
+                  controller: _pinHintController,
+                  decoration: InputDecoration(
+                    labelText: 'PIN Hint',
+                    hintText: 'e.g. Favorite number',
+                    prefixIcon: const Icon(Icons.help_outline),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onChanged: (val) => settingsNotifier.updatePinHint(val),
+                ),
+              ),
             const SizedBox(height: 8),
             SwitchListTile(
               title: const Text('Use Biometrics (FaceID/Fingerprint)'),

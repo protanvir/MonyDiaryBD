@@ -70,7 +70,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   void _verifyPin() {
     final settings = ref.read(userSettingsProvider);
-    if (_enteredPin == (settings.pin ?? '1234')) {
+    if (_enteredPin == settings.pin) {
       _onAuthenticated();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +111,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
-                          backgroundImage: settings.profileImagePath != null
+                          backgroundImage: settings.profileImagePath != null && File(settings.profileImagePath!).existsSync()
                               ? FileImage(File(settings.profileImagePath!))
                               : null,
                           child: settings.profileImagePath == null
@@ -168,7 +168,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 _buildNumberPad(theme),
                 const SizedBox(height: 24),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    final hint = settings.pinHint;
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('PIN Hint'),
+                        content: Text(hint == null || hint.isEmpty 
+                          ? 'No hint available. If you have biometrics enabled, you can use that to login. Otherwise, you may need to reinstall the app.' 
+                          : 'Your hint: $hint'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+                        ],
+                      ),
+                    );
+                  },
                   child: Text(
                     'Forgot PIN?',
                     style: TextStyle(
