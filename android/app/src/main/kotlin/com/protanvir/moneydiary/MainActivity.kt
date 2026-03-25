@@ -1,4 +1,4 @@
-package com.example.khorochpati.khorochpati
+package com.protanvir.moneydiary
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

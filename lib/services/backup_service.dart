@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:google_sign_in/google_sign_in.dart' as gsi;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -21,22 +21,31 @@ class GoogleAuthClient extends http.BaseClient {
 }
 
 class BackupService {
-  // final gsi.GoogleSignIn _googleSignIn = gsi.GoogleSignIn(
-  //   scopes: [
-  //     drive.DriveApi.driveAppdataScope, 
-  //   ],
-  // );
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final List<String> _scopes = [drive.DriveApi.driveAppdataScope];
+  bool _initialized = false;
+
+  Future<void> _ensureInitialized() async {
+    if (!_initialized) {
+      await _googleSignIn.initialize();
+      _initialized = true;
+    }
+  }
 
   Future<drive.DriveApi?> _getDriveApi() async {
-    // TODO: USER must configure google_sign_in OAuth Client ID in cloud console.
-    throw Exception('Google Sign In is mocked. Please configure OAuth Client ID and uncomment GoogleSignIn in BackupService.');
+    await _ensureInitialized();
     
-    // final account = await _googleSignIn.signIn();
-    // if (account == null) return null;
+    // 1. Sign in (Authentication)
+    GoogleSignInAccount? account = await _googleSignIn.authenticate();
     
-    // final authHeaders = await account.authHeaders;
-    // final client = GoogleAuthClient(authHeaders);
-    // return drive.DriveApi(client);
+    // 2. Request Scopes (Authorization)
+    // In 7.x, scopes are requested via the authorizationClient
+    final authHeaders = await account.authorizationClient.authorizationHeaders(_scopes, promptIfNecessary: true);
+    
+    if (authHeaders == null) return null;
+    
+    final client = GoogleAuthClient(authHeaders);
+    return drive.DriveApi(client);
   }
 
   Future<void> backupDatabase() async {
