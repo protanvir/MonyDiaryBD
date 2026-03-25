@@ -25,9 +25,12 @@ class BackupService {
   final List<String> _scopes = [drive.DriveApi.driveAppdataScope];
   bool _initialized = false;
 
+  /// TODO: Replace this with your Web Client ID from Google Cloud Console
+  static const String? _serverClientId = '741556846215-rcaito06f4r4grk4dkdm3neu4ddl1v7o.apps.googleusercontent.com'; 
+
   Future<void> _ensureInitialized() async {
     if (!_initialized) {
-      await _googleSignIn.initialize();
+      await _googleSignIn.initialize(serverClientId: _serverClientId);
       _initialized = true;
     }
   }
